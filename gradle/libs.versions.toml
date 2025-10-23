@@ -1,0 +1,5 @@
+[versions]
+datafixerupper = "6.0.8"
+
+[libraries]
+datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
