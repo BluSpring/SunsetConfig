@@ -2,10 +2,14 @@ package xyz.bluspring.sunset.values
 
 import com.mojang.serialization.Codec
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KType
 
-class ReflectingConfigValue<T>(id: String, codec: Codec<T>, val property: KMutableProperty<T>, val owner: Any? = null) : ConfigValue<T>(id, codec,
+open class ReflectingConfigValue<T>(id: String, codec: Codec<T>, val property: KMutableProperty<T>, val owner: Any? = null) : ConfigValue<T>(id, codec,
     if (owner != null) property.getter.call(owner) else property.getter.call()
 ) {
+    override val type: KType
+        get() = this.property.returnType
+
     override var value: T
         get() = if (owner != null) this.property.getter.call(owner) else this.property.getter.call()
         set(value) {

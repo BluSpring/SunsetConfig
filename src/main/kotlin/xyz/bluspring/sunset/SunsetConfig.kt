@@ -4,9 +4,7 @@ import com.mojang.serialization.Codec
 import xyz.bluspring.sunset.codec.ConfigCategoryMapCodec
 import xyz.bluspring.sunset.serializer.JsonSerializer
 import xyz.bluspring.sunset.serializer.Serializer
-import xyz.bluspring.sunset.values.ConfigCategory
-import xyz.bluspring.sunset.values.ConfigValue
-import xyz.bluspring.sunset.values.ReflectingConfigValue
+import xyz.bluspring.sunset.values.*
 import java.nio.file.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.createParentDirectories
@@ -21,7 +19,7 @@ class SunsetConfig private constructor(
     val path = path.absolute()
 
     class CategoryBuilder internal constructor(private val id: String) {
-        private val values = mutableListOf<ConfigValue<*>>()
+        internal val values = mutableListOf<ConfigValue<*>>()
         private var parent: CategoryBuilder? = null
 
         fun category(id: String, builder: CategoryBuilder.() -> Unit) {
@@ -45,17 +43,46 @@ class SunsetConfig private constructor(
             return configValue
         }
 
+        fun <T : Number> ranged(id: String, codec: Codec<T>, min: T, max: T, step: T, property: KMutableProperty<T>, owner: Any? = null): RangedConfigValue<T> {
+            if (values.any { it.id == id })
+                throw IllegalArgumentException("Config value ID $fullId.$id already exists!")
+
+            val configValue = RangedConfigValue(id, codec, property, owner, min, max, step)
+            values.add(configValue)
+
+            return configValue
+        }
+
+        fun <U, T : ConfigValue<U>> custom(value: T): T {
+            if (values.any { it.id == value.id })
+                throw IllegalArgumentException("Config value ID $fullId.$id already exists!")
+
+            values.add(value)
+            return value
+        }
+
+        fun <U, T : WrappedConfigValue<U>> custom(value: T): T {
+            if (values.contains(value.wrapped))
+                values.remove(value.wrapped)
+
+            if (values.any { it.id == value.id })
+                throw IllegalArgumentException("Config value ID $fullId.$id already exists!")
+
+            values.add(value)
+            return value
+        }
+
         fun integer(id: String, property: KMutableProperty<Int>, owner: Any? = null) = value(id, Codec.INT, property, owner)
-        fun integer(id: String, min: Int, max: Int, property: KMutableProperty<Int>, owner: Any? = null) = value(id, Codec.intRange(min, max), property, owner)
+        fun integer(id: String, min: Int, max: Int, property: KMutableProperty<Int>, owner: Any? = null, step: Int = 1) = ranged(id, Codec.intRange(min, max), min, max, step, property, owner)
 
         fun long(id: String, property: KMutableProperty<Long>, owner: Any? = null) = value(id, Codec.LONG, property, owner)
-        fun long(id: String, min: Long, max: Long, property: KMutableProperty<Long>, owner: Any? = null) = value(id, Codec.checkRange(min, max).run { Codec.LONG.flatXmap(this, this) }, property, owner)
+        fun long(id: String, min: Long, max: Long, property: KMutableProperty<Long>, owner: Any? = null, step: Long = 1) = ranged(id, Codec.checkRange(min, max).run { Codec.LONG.flatXmap(this, this) }, min, max, step, property, owner)
 
         fun float(id: String, property: KMutableProperty<Float>, owner: Any? = null) = value(id, Codec.FLOAT, property, owner)
-        fun float(id: String, min: Float, max: Float, property: KMutableProperty<Float>, owner: Any? = null) = value(id, Codec.floatRange(min, max), property, owner)
+        fun float(id: String, min: Float, max: Float, property: KMutableProperty<Float>, owner: Any? = null, step: Float = 1f) = ranged(id, Codec.floatRange(min, max), min, max, step, property, owner)
 
         fun double(id: String, property: KMutableProperty<Double>, owner: Any? = null) = value(id, Codec.DOUBLE, property, owner)
-        fun double(id: String, min: Double, max: Double, property: KMutableProperty<Double>, owner: Any? = null) = value(id, Codec.doubleRange(min, max), property, owner)
+        fun double(id: String, min: Double, max: Double, property: KMutableProperty<Double>, owner: Any? = null, step: Double = 1.0) = ranged(id, Codec.doubleRange(min, max), min, max, step, property, owner)
 
         fun string(id: String, property: KMutableProperty<String>, owner: Any? = null) = value(id, Codec.STRING, property, owner)
 

@@ -1,10 +1,13 @@
 package xyz.bluspring.sunset.values
 
 import com.mojang.serialization.Codec
+import kotlin.reflect.KType
 
-open class ConfigValue<T>(val id: String, val codec: Codec<T>, val default: T) {
-    var parent: ConfigCategory? = null
+abstract class ConfigValue<T>(val id: String, val codec: Codec<T>, val default: T) {
+    open var parent: ConfigCategory? = null
         internal set
+
+    abstract val type: KType
 
     private var cachedFullId: String? = null
     val fullId: String
@@ -33,4 +36,6 @@ open class ConfigValue<T>(val id: String, val codec: Codec<T>, val default: T) {
     open fun resetToDefault() {
         this.value = default
     }
+
+    open val shouldBeSerialized = true
 }

@@ -1,6 +1,8 @@
 package xyz.bluspring.sunset.values
 
 import com.mojang.serialization.Codec
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 class ConfigCategory(id: String, codec: Codec<List<ConfigValue<*>>>, values: List<ConfigValue<*>>) : ConfigValue<List<ConfigValue<*>>>(id, codec, values) {
     override var value: List<ConfigValue<*>>
@@ -13,6 +15,9 @@ class ConfigCategory(id: String, codec: Codec<List<ConfigValue<*>>>, values: Lis
                     .value = newValue.value
             }
         }
+
+    override val type: KType
+        get() = Unit::class.createType()
 
     fun <T> getValueById(id: String): ConfigValue<T>? {
         return this.value.firstOrNull { it.id == id } as? ConfigValue<T>

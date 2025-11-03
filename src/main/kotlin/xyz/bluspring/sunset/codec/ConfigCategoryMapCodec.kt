@@ -26,13 +26,18 @@ class ConfigCategoryMapCodec(private val values: List<ConfigValue<*>>) : MapCode
         val errors = mutableListOf<DataResult.PartialResult<Any?>>()
 
         for ((key, codecs) in this.codecs.entries) {
+            val value = this.values.first { it.id == key } as ConfigValue<Any?>
+
+            if (!value.shouldBeSerialized)
+                continue
+
             val parsed = codecs.second.decode(ops, input)
             parsed.error().ifPresent { e ->
                 errors.add(e)
             }
 
             parsed.result().ifPresent { result ->
-                val value = this.values.first { it.id == key } as ConfigValue<Any?>
+                val value = value
                 value.value = result
                 success.add(value)
             }
@@ -51,6 +56,9 @@ class ConfigCategoryMapCodec(private val values: List<ConfigValue<*>>) : MapCode
         prefix: RecordBuilder<T>
     ): RecordBuilder<T> {
         for (value in input) {
+            if (!value.shouldBeSerialized)
+                continue
+
             prefix.add(
                 ops.createString(value.id),
                 (value as ConfigValue<Any?>).codec.encodeStart(ops, value.value)
