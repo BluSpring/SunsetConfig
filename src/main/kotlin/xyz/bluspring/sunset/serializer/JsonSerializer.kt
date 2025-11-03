@@ -25,6 +25,8 @@ class JsonSerializer(
     }
 
     override fun saveSerialized(path: Path, data: JsonElement) {
-        path.writeText(this.gson.toJson(data), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE)
+        path.writeText(this.gson.toJson(data), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+            // why the hell is this not default?
+            StandardOpenOption.TRUNCATE_EXISTING)
     }
 }
