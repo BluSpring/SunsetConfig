@@ -1,13 +1,47 @@
 plugins {
     kotlin("jvm") version "2.2.20"
+    `maven-publish`
 }
 
-group = "xyz.bluspring"
-version = "1.0.0"
+base {
+    archivesName.set("sunset-config")
+}
 
-repositories {
-    mavenCentral()
-    maven("https://libraries.minecraft.net")
+allprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "maven-publish")
+
+    repositories {
+        mavenCentral()
+        maven("https://libraries.minecraft.net")
+    }
+
+    dependencies {
+    }
+
+    group = "xyz.bluspring.sunset"
+    version = "1.0.0"
+
+    project.extensions.configure<PublishingExtension>("publishing") {
+        repositories {
+            maven("https://mvn.devos.one/releases") {
+                credentials {
+                    username = System.getenv()["MAVEN_USER"]
+                    password = System.getenv()["MAVEN_PASS"]
+                }
+            }
+        }
+
+        publications {
+            create<MavenPublication>("mavenJava") {
+                groupId = project.group.toString()
+                artifactId = project.base.archivesName.get()
+                version = project.version.toString()
+
+                from(components["java"])
+            }
+        }
+    }
 }
 
 dependencies {
