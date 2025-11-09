@@ -17,7 +17,20 @@ private val OUT_FIELD = JsonWriter::class.java.getDeclaredField("out").apply {
 
 fun JsonWriter.comment(comment: String): JsonWriter {
     NEW_LINE_METHOD.invoke(this)
-    (OUT_FIELD.get(this) as Writer).write("/* $comment */")
+    val writer = OUT_FIELD.get(this) as Writer
+
+    if (!comment.contains("\n")) {
+        writer.write("/* $comment */")
+    } else {
+        writer.write("/*")
+        for (line in comment.split("\n")) {
+            NEW_LINE_METHOD.invoke(this)
+            writer.write(line)
+        }
+        NEW_LINE_METHOD.invoke(this)
+        writer.write("*/")
+    }
+
     return this
 }
 
