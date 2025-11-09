@@ -23,7 +23,7 @@ class ConfigCategoryMapCodec(private val values: List<ConfigValue<*>>) : MapCode
         input: MapLike<T>
     ): DataResult<List<ConfigValue<*>>> {
         val success = mutableListOf<ConfigValue<Any?>>()
-        val errors = mutableListOf<DataResult.PartialResult<Any?>>()
+        val errors = mutableListOf<DataResult.Error<Any?>>()
 
         for ((key, codecs) in this.codecs.entries) {
             val value = this.values.first { it.id == key } as ConfigValue<Any?>
