@@ -22,6 +22,10 @@ allprojects {
     group = "xyz.bluspring.sunset"
     version = "1.1.1"
 
+    java {
+        withSourcesJar()
+    }
+
     project.extensions.configure<PublishingExtension>("publishing") {
         repositories {
             maven("https://mvn.devos.one/releases") {
