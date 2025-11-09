@@ -20,7 +20,7 @@ allprojects {
     }
 
     group = "xyz.bluspring.sunset"
-    version = "1.1.0"
+    version = "1.1.1"
 
     project.extensions.configure<PublishingExtension>("publishing") {
         repositories {
