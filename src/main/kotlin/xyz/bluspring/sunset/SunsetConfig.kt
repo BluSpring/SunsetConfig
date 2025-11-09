@@ -20,7 +20,19 @@ class SunsetConfig private constructor(
 
     class CategoryBuilder internal constructor(private val id: String) {
         internal val values = mutableListOf<ConfigValue<*>>()
+        internal val comments = mutableListOf<String>()
         private var parent: CategoryBuilder? = null
+
+        /**
+         * These comments will be visible in the written data if the serializer permits it,
+         * but they will not be visible in the UI implementation unless explicitly written to do so,
+         * as that information should instead be controlled via internationalization.
+         *
+         * Comments are not ordered!
+         */
+        fun comment(text: String) {
+            comments.add(text)
+        }
 
         fun category(id: String, builder: CategoryBuilder.() -> Unit) {
             if (id.trim() == "")
@@ -90,6 +102,10 @@ class SunsetConfig private constructor(
             return ConfigCategory(this.id, ConfigCategoryMapCodec(values).codec(), values).apply {
                 for (value in values) {
                     value.parent = this
+                }
+
+                for (comment in this@CategoryBuilder.comments) {
+                    comment(comment)
                 }
             }
         }

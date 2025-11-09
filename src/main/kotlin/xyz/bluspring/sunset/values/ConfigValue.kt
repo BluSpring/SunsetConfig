@@ -9,6 +9,12 @@ abstract class ConfigValue<T>(val id: String, val codec: Codec<T>, val default: 
 
     abstract val type: KType
 
+    val comments = mutableListOf<String>()
+
+    fun comment(comment: String) {
+        this.comments.add(comment)
+    }
+
     private var cachedFullId: String? = null
     val fullId: String
         get() {

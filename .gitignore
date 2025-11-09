@@ -45,5 +45,5 @@ bin/
 .DS_Store
 
 run/
-test.json
+test*.json*
 .idea/

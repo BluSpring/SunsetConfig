@@ -59,6 +59,12 @@ class ConfigCategoryMapCodec(private val values: List<ConfigValue<*>>) : MapCode
             if (!value.shouldBeSerialized)
                 continue
 
+            if (ops is DynamicOpsWithComments<T> && value.comments.isNotEmpty()) {
+                for ((index, comment) in value.comments.withIndex()) {
+                    prefix.add(ops.createString("__comment_${value.id}_$index"), ops.createComment(comment))
+                }
+            }
+
             prefix.add(
                 ops.createString(value.id),
                 (value as ConfigValue<Any?>).codec.encodeStart(ops, value.value)
