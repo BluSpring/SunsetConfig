@@ -32,8 +32,14 @@ repositories {
 }
 
 dependencies {
-    val sunsetVersion = "1.0.0" // Check the releases for the latest version.
+    val sunsetVersion = "1.3.0" // Check the releases for the latest version.
     api("xyz.bluspring.sunset:sunset-config:$sunsetVersion")
+    
+    // As of v1.3.0, you now also have to add another dependency, with a classifier 
+    // between either "dfu6" or "dfu8".
+    // If you are using Minecraft 1.20.4 and earlier, you will most likely have to use dfu6.
+    // Otherwise, you can safely use dfu8.
+    api("xyz.bluspring.sunset:sunset-config:$sunsetVersion:dfu8")
 }
 ```
 

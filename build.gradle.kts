@@ -20,7 +20,7 @@ allprojects {
     }
 
     group = "xyz.bluspring.sunset"
-    version = "1.2.0"
+    version = "1.3.0"
 
     java {
         withSourcesJar()
@@ -48,10 +48,42 @@ allprojects {
     }
 }
 
+val stubs by sourceSets.creating
+val stubsSquared by sourceSets.creating
+val dfu6 by sourceSets.creating
+val dfu8 by sourceSets.creating
+
 dependencies {
     api(kotlin("reflect"))
     testImplementation(kotlin("test"))
-    api(libs.datafixerupper)
+    compileOnly(libs.datafixerupper.v6)
+
+    "stubsCompileOnly"(libs.datafixerupper.v6)
+    "stubsCompileOnly"(stubsSquared.output)
+    "dfu6Api"(libs.datafixerupper.v6)
+    "dfu6CompileOnly"(sourceSets.main.get().output)
+    "dfu8Api"(libs.datafixerupper.v8)
+    "dfu8CompileOnly"(sourceSets.main.get().output)
+
+    compileOnly(stubs.output)
+}
+
+val dfu6Jar = tasks.register<Jar>("dfu6Jar") {
+    archiveClassifier.set("dfu6")
+    from(dfu6.output)
+}
+
+val dfu8Jar = tasks.register<Jar>("dfu8Jar") {
+    archiveClassifier.set("dfu8")
+    from(dfu8.output)
+}
+
+publishing {
+    publications {
+        val mavenJava = this.getByName<MavenPublication>("mavenJava")
+        mavenJava.artifact(dfu6Jar)
+        mavenJava.artifact(dfu8Jar)
+    }
 }
 
 tasks.test {
