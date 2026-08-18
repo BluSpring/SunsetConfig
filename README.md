@@ -39,6 +39,8 @@ dependencies {
     // between either "dfu6" or "dfu8".
     // If you are using Minecraft 1.20.4 and earlier, you will most likely have to use dfu6.
     // Otherwise, you can safely use dfu8.
+    // As of v1.3.1, if you are using Neo/Forge, you will need to use "dfu8-merged" if you are JiJing
+    // it into your mod.
     api("xyz.bluspring.sunset:sunset-config:$sunsetVersion:dfu8")
 }
 ```

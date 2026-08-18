@@ -20,7 +20,7 @@ allprojects {
     }
 
     group = "xyz.bluspring.sunset"
-    version = "1.3.0"
+    version = "1.3.1"
 
     java {
         withSourcesJar()
@@ -78,11 +78,25 @@ val dfu8Jar = tasks.register<Jar>("dfu8Jar") {
     from(dfu8.output)
 }
 
+val mergedDfu6Jar = tasks.register<Jar>("mergedDfu6Jar") {
+    archiveClassifier.set("dfu6-merged")
+    from(sourceSets.main.get().output)
+    from(dfu6.output)
+}
+
+val mergedDfu8Jar = tasks.register<Jar>("mergedDfu8Jar") {
+    archiveClassifier.set("dfu8-merged")
+    from(sourceSets.main.get().output)
+    from(dfu8.output)
+}
+
 publishing {
     publications {
         val mavenJava = this.getByName<MavenPublication>("mavenJava")
         mavenJava.artifact(dfu6Jar)
         mavenJava.artifact(dfu8Jar)
+        mavenJava.artifact(mergedDfu6Jar)
+        mavenJava.artifact(mergedDfu8Jar)
     }
 }
 
