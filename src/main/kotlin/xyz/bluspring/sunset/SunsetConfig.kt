@@ -1,6 +1,7 @@
 package xyz.bluspring.sunset
 
 import com.mojang.serialization.Codec
+import xyz.bluspring.sunset.codec.CategorySerializer
 import xyz.bluspring.sunset.codec.ConfigCategoryMapCodec
 import xyz.bluspring.sunset.serializer.JsonSerializer
 import xyz.bluspring.sunset.serializer.Serializer
@@ -129,11 +130,7 @@ class SunsetConfig private constructor(
             return
 
         val serializer = this.serializer as Serializer<Any?>
-
-        this.rootCategory.codec.decode(serializer.ops, serializer.readAsSerialized(path))
-            .map { entry ->
-                this.rootCategory.value = entry.first
-            }
+        CategorySerializer.encode(this.rootCategory, this.path, serializer)
     }
 
     fun save() {
@@ -141,7 +138,7 @@ class SunsetConfig private constructor(
             this.path.createParentDirectories()
 
         val serializer = this.serializer as Serializer<Any?>
-        serializer.saveSerialized(this.path, this.rootCategory.codec.encodeStart(serializer.ops, this.rootCategory.value).result().orElseThrow())
+        CategorySerializer.decode(this.rootCategory, this.path, serializer)
     }
 
     fun <T> getConfigValueById(id: String): ConfigValue<T>? {
